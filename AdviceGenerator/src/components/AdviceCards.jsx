@@ -1,49 +1,40 @@
-import { useState } from "react";
-import AuthorRow from "./AuthorRow";
-
-const dummyAdvice = [
-  {
-    category: "Life",
-    advice: "Always strive for progress, not perfection.",
-    author: "Unknown",
-  },
-  {
-    category: "Career",
-    advice: "Take risks and embrace failures as learning opportunities.",
-    author: "Steve Jobs",
-  },
-  {
-    category: "Relationships",
-    advice: "Communication is key in any relationship.",
-    author: "Unknown",
-  },
-];
+import { useState, useEffect } from "react";
 
 export default function AdviceCards() {
-  const [advice, setAdvice] = useState(dummyAdvice);
+  const [advice, setAdvice] = useState([]);
 
-  console.log(advice); // Log out the advice state
+  useEffect(() => {
+    const fetchAdvice = async () => {
+      try {
+        const response = await fetch('https://api.adviceslip.com/advice');
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
+        }
+        const data = await response.json();
+        const adviceData = data.slip;
+        setAdvice(adviceData);
+        console.log(adviceData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchAdvice();
+  }, []);
 
   return (
     <table>
       <thead>
         <tr>
-          <th colSpan="3">Advice Cards</th>
+          <th colSpan="3">Random Adivce for the day:</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td>Category</td>
-          <td>Advice</td>
-          <td>Author</td>
+          <td>{advice.category}</td>
+          <td>{advice.advice}</td>
+          <td>{advice.author}</td>
         </tr>
-        {advice.map((item, index) => (
-          <tr key={index}>
-            <td>{item.category}</td>
-            <td>{item.advice}</td>
-            <td>{item.author}</td>
-          </tr>
-        ))}
       </tbody>
     </table>
   );
